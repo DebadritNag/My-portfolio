@@ -15,12 +15,13 @@ A modern, responsive portfolio website built with React, TypeScript, and Vite. F
 ## 🌟 Features
 
 - Responsive design that works on all devices
-- Smooth animations and transitions
+- Optimized animations for smooth performance on mobile and desktop
 - Dark/light theme toggle
 - Single-page application layout
 - Interactive components with hover effects
 - Social media integration
 - Downloadable CV functionality
+- Functional contact form with email integration
 
 ## 📁 Project Structure
 
@@ -96,6 +97,19 @@ The design follows modern UI/UX principles with:
 - Gradient accents
 - Smooth animations
 - Accessible color contrast
+
+## 📞 Contact Form Setup
+
+The contact form uses EmailJS to send emails. To enable this functionality:
+
+1. Sign up at [EmailJS](https://www.emailjs.com/)
+2. Create a new service and template for receiving messages
+3. Create a second template for auto-replies to users
+4. Update the values in [src/components/Contact.tsx](file:///c%3A/Users/ASUS/OneDrive/Desktop/Figmaportfolio/src/components/Contact.tsx):
+   - `serviceID`: Your service ID
+   - `templateID`: Your main template ID (for receiving messages)
+   - `publicKey`: Your public key
+   - `autoReplyTemplateID`: Your auto-reply template ID (for user confirmation)
 
 ## 📞 Contact
 

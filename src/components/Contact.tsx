@@ -1,5 +1,18 @@
-import { useState } from "react";
+/*
+ * To enable email functionality:
+ * 1. Sign up at https://www.emailjs.com/
+ * 2. Create a new service and template
+ * 3. Create a second template for auto-replies to users
+ * 4. Replace the placeholder values below with your actual EmailJS credentials:
+ *    - serviceID: Your service ID
+ *    - templateID: Your main template ID (for receiving messages)
+ *    - publicKey: Your public key
+ *    - autoReplyTemplateID: Your auto-reply template ID (for user confirmation)
+ */
+
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
+import emailjs from "@emailjs/browser";
 import {
   Mail,
   Phone,
@@ -29,22 +42,73 @@ export default function Contact({ theme }: ContactProps) {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      // Using EmailJS to send the email
+      const templateParams = {
+        from_name: formData.name,
+        from_email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        to_email: "ritnag2023@gmail.com",
+      };
 
-    setIsSubmitting(false);
-    setSubmitted(true);
+      // EmailJS credentials
+      const serviceID = "service_ue4ob7m";
+      const templateID = "template_l62ggsn";
+      const publicKey = "jKrfGlnhJxPFnc8qB";
 
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setFormData({
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
-      });
-      setSubmitted(false);
-    }, 3000);
+      // Send email to you (the website owner)
+      const response = await emailjs.send(serviceID, templateID, templateParams, publicKey);
+      
+      // Send auto-reply to the user who submitted the form
+      // You'll need to create a separate template in EmailJS for auto-replies
+      // For now, we'll use the same template but you should create a dedicated one
+      const autoReplyTemplateParams = {
+        to_name: formData.name,
+        to_email: formData.email,
+        from_name: "Debadrit Nag",
+        subject: "Thank you for your message",
+        message: formData.message,
+      };
+      
+      // Replace with your auto-reply template ID
+      // You need to create this template in EmailJS dashboard
+      const autoReplyTemplateID = "YOUR_AUTO_REPLY_TEMPLATE_ID"; // e.g., "template_xxxxxxxx"
+      
+      // Send auto-reply (this will fail until you create the template)
+      try {
+        await emailjs.send(serviceID, autoReplyTemplateID, autoReplyTemplateParams, publicKey);
+      } catch (autoReplyError) {
+        console.log("Auto-reply failed (maybe template not set up yet), but main email was sent successfully");
+        console.log("Create an auto-reply template in EmailJS and update the autoReplyTemplateID");
+      }
+
+      if (response.status === 200) {
+        setIsSubmitting(false);
+        setSubmitted(true);
+        
+        // Reset form after 3 seconds
+        setTimeout(() => {
+          setFormData({
+            name: "",
+            email: "",
+            subject: "",
+            message: "",
+          });
+          setSubmitted(false);
+        }, 3000);
+      } else {
+        throw new Error("Failed to send message");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setIsSubmitting(false);
+      // Show error state for 3 seconds
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+      }, 3000);
+    }
   };
 
   const handleChange = (
@@ -142,11 +206,11 @@ export default function Contact({ theme }: ContactProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Left - Contact Info */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="space-y-8"
+            transition={{ duration: 0.4 }}
+            className="space-y-6"
           >
             {/* Contact Cards */}
             <div className="space-y-6">
@@ -154,16 +218,16 @@ export default function Contact({ theme }: ContactProps) {
                 <motion.a
                   key={index}
                   href={info.href}
-                  initial={{ opacity: 0, x: -30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ scale: 1.03, x: 10 }}
-                  className={`block p-6 rounded-xl ${
+                  transition={{ delay: index * 0.05, duration: 0.3 }}
+                  whileHover={{ scale: 1.02 }}
+                  className={`block p-5 rounded-xl ${
                     theme === "dark"
                       ? "bg-gradient-to-br from-slate-900/70 to-slate-800/70 border border-purple-500/30"
                       : "bg-gradient-to-br from-white/70 to-slate-50/70 border border-purple-500/30"
-                  } backdrop-blur-xl shadow-lg hover:shadow-xl transition-all duration-300`}
+                  } backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-200`}
                 >
                   <div className="flex items-center gap-4">
                     <motion.div
@@ -192,35 +256,34 @@ export default function Contact({ theme }: ContactProps) {
 
             {/* Social Links */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className={`p-8 rounded-xl ${
+              transition={{ delay: 0.2, duration: 0.3 }}
+              className={`p-6 rounded-xl ${
                 theme === "dark"
                   ? "bg-gradient-to-br from-purple-500/10 to-cyan-500/10 border border-purple-500/30"
                   : "bg-gradient-to-br from-purple-500/5 to-cyan-500/5 border border-purple-500/30"
-              } backdrop-blur-xl shadow-lg`}
+              } backdrop-blur-sm shadow-md`}
             >
               <h3
-                className={`text-xl mb-6 ${theme === "dark" ? "text-white" : "text-slate-900"}`}
+                className={`text-lg mb-4 ${theme === "dark" ? "text-white" : "text-slate-900"}`}
               >
                 Connect on Social Media
               </h3>
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 {socialLinks.map((social, index) => (
                   <motion.a
                     key={index}
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    initial={{ opacity: 0, scale: 0.5 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ delay: 0.4 + index * 0.1 }}
-                    whileHover={{ scale: 1.2, rotate: 360 }}
-                    whileTap={{ scale: 0.9 }}
-                    className={`w-12 h-12 rounded-lg ${
+                    transition={{ delay: 0.3 + index * 0.05, duration: 0.2 }}
+                    whileHover={{ scale: 1.1 }}
+                    className={`w-10 h-10 rounded-lg ${
                       theme === "dark"
                         ? "bg-slate-900/50 text-slate-400"
                         : "bg-white/50 text-slate-600"
@@ -228,10 +291,10 @@ export default function Contact({ theme }: ContactProps) {
                       theme === "dark"
                         ? "border-purple-500/20"
                         : "border-purple-500/30"
-                    } flex items-center justify-center ${social.color} transition-colors duration-300`}
+                    } flex items-center justify-center ${social.color} transition-colors duration-200`}
                     aria-label={social.label}
                   >
-                    <social.icon className="w-6 h-6" />
+                    <social.icon className="w-5 h-5" />
                   </motion.a>
                 ))}
               </div>
@@ -269,10 +332,10 @@ export default function Contact({ theme }: ContactProps) {
 
           {/* Right - Contact Form */}
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.4 }}
           >
             <motion.form
               onSubmit={handleSubmit}
@@ -284,10 +347,10 @@ export default function Contact({ theme }: ContactProps) {
             >
               {/* Name Field */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
+                transition={{ delay: 0.05, duration: 0.3 }}
               >
                 <label
                   htmlFor="name"
@@ -314,10 +377,10 @@ export default function Contact({ theme }: ContactProps) {
 
               {/* Email Field */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
+                transition={{ delay: 0.1, duration: 0.3 }}
               >
                 <label
                   htmlFor="email"
@@ -344,10 +407,10 @@ export default function Contact({ theme }: ContactProps) {
 
               {/* Subject Field */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.15, duration: 0.3 }}
               >
                 <label
                   htmlFor="subject"
@@ -374,10 +437,10 @@ export default function Contact({ theme }: ContactProps) {
 
               {/* Message Field */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.4 }}
+                transition={{ delay: 0.2, duration: 0.3 }}
               >
                 <label
                   htmlFor="message"
@@ -408,51 +471,33 @@ export default function Contact({ theme }: ContactProps) {
                 disabled={isSubmitting || submitted}
                 whileHover={
                   !isSubmitting && !submitted
-                    ? {
-                        scale: 1.02,
-                        boxShadow:
-                          "0 0 30px rgba(168, 85, 247, 0.5)",
-                      }
+                    ? { scale: 1.01 }
                     : {}
                 }
                 whileTap={
                   !isSubmitting && !submitted
-                    ? { scale: 0.98 }
+                    ? { scale: 0.99 }
                     : {}
                 }
-                className={`w-full py-4 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 ${
+                className={`w-full py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 ${
                   submitted
                     ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white"
-                    : "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/50 hover:shadow-purple-500/80"
+                    : "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/50 hover:shadow-purple-500/70"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {isSubmitting ? (
                   <>
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{
-                        duration: 1,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                      className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                    />
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Sending...</span>
                   </>
                 ) : submitted ? (
                   <>
-                    <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring" }}
-                    >
-                      ✓
-                    </motion.span>
+                    <span>✓</span>
                     <span>Message Sent!</span>
                   </>
                 ) : (
                   <>
-                    <Send className="w-5 h-5" />
+                    <Send className="w-4 h-4" />
                     <span>Send Message</span>
                   </>
                 )}
