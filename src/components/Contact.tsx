@@ -1,13 +1,9 @@
 /*
- * To enable email functionality:
- * 1. Sign up at https://www.emailjs.com/
- * 2. Create a new service and template
- * 3. Create a second template for auto-replies to users
- * 4. Replace the placeholder values below with your actual EmailJS credentials:
- *    - serviceID: Your service ID
- *    - templateID: Your main template ID (for receiving messages)
- *    - publicKey: Your public key
- *    - autoReplyTemplateID: Your auto-reply template ID (for user confirmation)
+ * EmailJS Configuration:
+ * - serviceID: service_ue4ob7m
+ * - templateID: template_l62ggsn (main template for receiving messages)
+ * - publicKey: jKrfGlnhJxPFnc8qB
+ * - autoReplyTemplateID: template_5gvngjr (auto-reply template for user confirmation)
  */
 
 import { useState, useEffect } from "react";
@@ -71,16 +67,15 @@ export default function Contact({ theme }: ContactProps) {
         message: formData.message,
       };
       
-      // Replace with your auto-reply template ID
-      // You need to create this template in EmailJS dashboard
-      const autoReplyTemplateID = "YOUR_AUTO_REPLY_TEMPLATE_ID"; // e.g., "template_xxxxxxxx"
+      // Auto-reply template ID
+      const autoReplyTemplateID = "template_5gvngjr";
       
       // Send auto-reply (this will fail until you create the template)
       try {
         await emailjs.send(serviceID, autoReplyTemplateID, autoReplyTemplateParams, publicKey);
       } catch (autoReplyError) {
-        console.log("Auto-reply failed (maybe template not set up yet), but main email was sent successfully");
-        console.log("Create an auto-reply template in EmailJS and update the autoReplyTemplateID");
+        console.log("Auto-reply failed, but main email was sent successfully");
+        console.log("Check your auto-reply template configuration in EmailJS");
       }
 
       if (response.status === 200) {
