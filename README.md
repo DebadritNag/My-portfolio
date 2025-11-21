@@ -1,4 +1,4 @@
-# Animated Portfolio Website
+# My Portfolio Website
 
 A modern, responsive portfolio website built with React, TypeScript, and Vite. Features smooth animations, dark/light theme support, and a clean design.
 
